@@ -12,7 +12,7 @@ use tokio::sync::RwLock;
 use tower_http::cors::CorsLayer;
 use tracing::{info, warn};
 
-use crate::data_store::{DataStore, Statistics};
+use crate::data_store::{DataStore, Event, Statistics};
 use crate::subgraph_types::*;
 
 type AppState = Arc<RwLock<DataStore>>;
@@ -64,7 +64,7 @@ async fn get_loan_accepteds(
 ) -> Result<Json<Vec<LoanAccepted>>, StatusCode> {
     let data_store = state.read().await;
     let events = data_store.get_events(Some("LoanAccepted"), None, None);
-    
+
     let loan_accepteds: Vec<LoanAccepted> = events
         .into_iter()
         .filter_map(|event| {
@@ -73,16 +73,19 @@ async fn get_loan_accepteds(
                 Some(LoanAccepted {
                     block_number: event.block_number.to_string(),
                     block_timestamp: event.block_timestamp.to_string(),
-                    borrower: decoded.get("borrower")
+                    borrower: decoded
+                        .get("borrower")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0x0")
                         .to_string(),
-                    initial_collateral_ratio: decoded.get("initialCollateralRatio")
+                    initial_collateral_ratio: decoded
+                        .get("initialCollateralRatio")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
                     id: format!("{}-{}", event.transaction_hash, event.log_index),
-                    loan_id: decoded.get("loanId")
+                    loan_id: decoded
+                        .get("loanId")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
@@ -104,62 +107,75 @@ async fn get_loan_createds(
 ) -> Result<Json<Vec<LoanCreated>>, StatusCode> {
     let data_store = state.read().await;
     let events = data_store.get_events(Some("LoanCreated"), None, None);
-    
+
     let loan_createds: Vec<LoanCreated> = events
         .into_iter()
         .filter_map(|event| {
             if let Some(decoded) = &event.decoded_data {
                 Some(LoanCreated {
-                    amount: decoded.get("amount")
+                    amount: decoded
+                        .get("amount")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
-                    amount_usd: decoded.get("amountUSD")
+                    amount_usd: decoded
+                        .get("amountUSD")
                         .and_then(|v| v.as_str())
                         .map(|s| s.to_string()),
                     block_number: event.block_number.to_string(),
                     block_timestamp: event.block_timestamp.to_string(),
-                    collateral_address: decoded.get("collateralAddress")
+                    collateral_address: decoded
+                        .get("collateralAddress")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0x0")
                         .to_string(),
-                    collateral_amount: decoded.get("collateralAmount")
+                    collateral_amount: decoded
+                        .get("collateralAmount")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
-                    duration: decoded.get("duration")
+                    duration: decoded
+                        .get("duration")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
                     id: format!("{}-{}", event.transaction_hash, event.log_index),
-                    interest_rate: decoded.get("interestRate")
+                    interest_rate: decoded
+                        .get("interestRate")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
-                    lender: decoded.get("lender")
+                    lender: decoded
+                        .get("lender")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0x0")
                         .to_string(),
-                    liquidation_threshold_bps: decoded.get("liquidationThresholdBPS")
+                    liquidation_threshold_bps: decoded
+                        .get("liquidationThresholdBPS")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
-                    loan_id: decoded.get("loanId")
+                    loan_id: decoded
+                        .get("loanId")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
-                    max_price_staleness: decoded.get("maxPriceStaleness")
+                    max_price_staleness: decoded
+                        .get("maxPriceStaleness")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
-                    min_collateral_ratio_bps: decoded.get("minCollateralRatioBPS")
+                    min_collateral_ratio_bps: decoded
+                        .get("minCollateralRatioBPS")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
-                    price_usd: decoded.get("priceUSD")
+                    price_usd: decoded
+                        .get("priceUSD")
                         .and_then(|v| v.as_str())
                         .map(|s| s.to_string()),
-                    token_address: decoded.get("tokenAddress")
+                    token_address: decoded
+                        .get("tokenAddress")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0x0")
                         .to_string(),
@@ -180,7 +196,7 @@ async fn get_loan_liquidateds(
 ) -> Result<Json<Vec<LoanLiquidated>>, StatusCode> {
     let data_store = state.read().await;
     let events = data_store.get_events(Some("LoanLiquidated"), None, None);
-    
+
     let loan_liquidateds: Vec<LoanLiquidated> = events
         .into_iter()
         .filter_map(|event| {
@@ -189,19 +205,23 @@ async fn get_loan_liquidateds(
                     block_number: event.block_number.to_string(),
                     block_timestamp: event.block_timestamp.to_string(),
                     id: format!("{}-{}", event.transaction_hash, event.log_index),
-                    collateral_claimed_by_lender: decoded.get("collateralClaimedByLender")
+                    collateral_claimed_by_lender: decoded
+                        .get("collateralClaimedByLender")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
-                    liquidator: decoded.get("liquidator")
+                    liquidator: decoded
+                        .get("liquidator")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0x0")
                         .to_string(),
-                    liquidator_reward: decoded.get("liquidatorReward")
+                    liquidator_reward: decoded
+                        .get("liquidatorReward")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
-                    loan_id: decoded.get("loanId")
+                    loan_id: decoded
+                        .get("loanId")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
@@ -223,7 +243,7 @@ async fn get_loan_offer_cancelleds(
 ) -> Result<Json<Vec<LoanOfferCancelled>>, StatusCode> {
     let data_store = state.read().await;
     let events = data_store.get_events(Some("LoanOfferCancelled"), None, None);
-    
+
     let loan_offer_cancelleds: Vec<LoanOfferCancelled> = events
         .into_iter()
         .filter_map(|event| {
@@ -232,11 +252,13 @@ async fn get_loan_offer_cancelleds(
                     block_timestamp: event.block_timestamp.to_string(),
                     block_number: event.block_number.to_string(),
                     id: format!("{}-{}", event.transaction_hash, event.log_index),
-                    lender: decoded.get("lender")
+                    lender: decoded
+                        .get("lender")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0x0")
                         .to_string(),
-                    loan_id: decoded.get("loanId")
+                    loan_id: decoded
+                        .get("loanId")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
@@ -258,7 +280,7 @@ async fn get_loan_offer_removeds(
 ) -> Result<Json<Vec<LoanOfferRemoved>>, StatusCode> {
     let data_store = state.read().await;
     let events = data_store.get_events(Some("LoanOfferRemoved"), None, None);
-    
+
     let loan_offer_removeds: Vec<LoanOfferRemoved> = events
         .into_iter()
         .filter_map(|event| {
@@ -267,11 +289,13 @@ async fn get_loan_offer_removeds(
                     block_number: event.block_number.to_string(),
                     block_timestamp: event.block_timestamp.to_string(),
                     id: format!("{}-{}", event.transaction_hash, event.log_index),
-                    loan_id: decoded.get("loanId")
+                    loan_id: decoded
+                        .get("loanId")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
-                    reason: decoded.get("reason")
+                    reason: decoded
+                        .get("reason")
                         .and_then(|v| v.as_str())
                         .unwrap_or("Unknown")
                         .to_string(),
@@ -292,7 +316,7 @@ async fn get_loan_repaids(
 ) -> Result<Json<Vec<LoanRepaid>>, StatusCode> {
     let data_store = state.read().await;
     let events = data_store.get_events(Some("LoanRepaid"), None, None);
-    
+
     let loan_repaids: Vec<LoanRepaid> = events
         .into_iter()
         .filter_map(|event| {
@@ -300,16 +324,19 @@ async fn get_loan_repaids(
                 Some(LoanRepaid {
                     block_number: event.block_number.to_string(),
                     block_timestamp: event.block_timestamp.to_string(),
-                    borrower: decoded.get("borrower")
+                    borrower: decoded
+                        .get("borrower")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0x0")
                         .to_string(),
                     id: format!("{}-{}", event.transaction_hash, event.log_index),
-                    loan_id: decoded.get("loanId")
+                    loan_id: decoded
+                        .get("loanId")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
-                    repayment_amount: decoded.get("repaymentAmount")
+                    repayment_amount: decoded
+                        .get("repaymentAmount")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0")
                         .to_string(),
@@ -331,7 +358,7 @@ async fn get_price_feed_sets(
 ) -> Result<Json<Vec<PriceFeedSet>>, StatusCode> {
     let data_store = state.read().await;
     let events = data_store.get_events(Some("PriceFeedSet"), None, None);
-    
+
     let price_feed_sets: Vec<PriceFeedSet> = events
         .into_iter()
         .filter_map(|event| {
@@ -339,12 +366,14 @@ async fn get_price_feed_sets(
                 Some(PriceFeedSet {
                     block_number: event.block_number.to_string(),
                     block_timestamp: event.block_timestamp.to_string(),
-                    feed_address: decoded.get("feedAddress")
+                    feed_address: decoded
+                        .get("feedAddress")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0x0")
                         .to_string(),
                     id: format!("{}-{}", event.transaction_hash, event.log_index),
-                    token_address: decoded.get("tokenAddress")
+                    token_address: decoded
+                        .get("tokenAddress")
                         .and_then(|v| v.as_str())
                         .unwrap_or("0x0")
                         .to_string(),
@@ -365,7 +394,7 @@ async fn get_protocol_stats(
 ) -> Result<Json<Vec<ProtocolStats>>, StatusCode> {
     let data_store = state.read().await;
     let stats = data_store.get_statistics();
-    
+
     // Convert our statistics to protocol stats format
     let protocol_stats = vec![ProtocolStats {
         total_loan_volume: stats.total_volume,
@@ -381,14 +410,12 @@ async fn get_tokens(
     State(_state): State<AppState>,
 ) -> Result<Json<Vec<Token>>, StatusCode> {
     // Mock token data - replace with real token registry
-    let tokens = vec![
-        Token {
-            decimals: "18".to_string(),
-            id: "0x0000000000000000000000000000000000000000".to_string(),
-            price_feed_decimals: "8".to_string(),
-            price_feed: "0x0000000000000000000000000000000000000000".to_string(),
-        }
-    ];
+    let tokens = vec![Token {
+        decimals: "18".to_string(),
+        id: "0x0000000000000000000000000000000000000000".to_string(),
+        price_feed_decimals: "8".to_string(),
+        price_feed: "0x0000000000000000000000000000000000000000".to_string(),
+    }];
 
     Ok(Json(tokens))
 }
@@ -398,77 +425,122 @@ async fn get_combined_query(
     State(state): State<AppState>,
 ) -> Result<Json<MyQueryResponse>, StatusCode> {
     // Get all data types in parallel
-    let loan_accepteds = get_loan_accepteds(Query(QueryParams { 
-        first: params.first, 
-        skip: params.skip, 
-        orderBy: params.orderBy.clone(), 
-        orderDirection: params.orderDirection.clone(), 
-        where_clause: params.where_clause.clone() 
-    }), State(state.clone())).await?.0;
-    
-    let loan_createds = get_loan_createds(Query(QueryParams { 
-        first: params.first, 
-        skip: params.skip, 
-        orderBy: params.orderBy.clone(), 
-        orderDirection: params.orderDirection.clone(), 
-        where_clause: params.where_clause.clone() 
-    }), State(state.clone())).await?.0;
-    
-    let loan_liquidateds = get_loan_liquidateds(Query(QueryParams { 
-        first: params.first, 
-        skip: params.skip, 
-        orderBy: params.orderBy.clone(), 
-        orderDirection: params.orderDirection.clone(), 
-        where_clause: params.where_clause.clone() 
-    }), State(state.clone())).await?.0;
-    
-    let loan_offer_cancelleds = get_loan_offer_cancelleds(Query(QueryParams { 
-        first: params.first, 
-        skip: params.skip, 
-        orderBy: params.orderBy.clone(), 
-        orderDirection: params.orderDirection.clone(), 
-        where_clause: params.where_clause.clone() 
-    }), State(state.clone())).await?.0;
-    
-    let loan_offer_removeds = get_loan_offer_removeds(Query(QueryParams { 
-        first: params.first, 
-        skip: params.skip, 
-        orderBy: params.orderBy.clone(), 
-        orderDirection: params.orderDirection.clone(), 
-        where_clause: params.where_clause.clone() 
-    }), State(state.clone())).await?.0;
-    
-    let loan_repaids = get_loan_repaids(Query(QueryParams { 
-        first: params.first, 
-        skip: params.skip, 
-        orderBy: params.orderBy.clone(), 
-        orderDirection: params.orderDirection.clone(), 
-        where_clause: params.where_clause.clone() 
-    }), State(state.clone())).await?.0;
-    
-    let price_feed_sets = get_price_feed_sets(Query(QueryParams { 
-        first: params.first, 
-        skip: params.skip, 
-        orderBy: params.orderBy.clone(), 
-        orderDirection: params.orderDirection.clone(), 
-        where_clause: params.where_clause.clone() 
-    }), State(state.clone())).await?.0;
-    
-    let protocol_stats_collection = get_protocol_stats(Query(QueryParams { 
-        first: params.first, 
-        skip: params.skip, 
-        orderBy: params.orderBy.clone(), 
-        orderDirection: params.orderDirection.clone(), 
-        where_clause: params.where_clause.clone() 
-    }), State(state.clone())).await?.0;
-    
-    let tokens = get_tokens(Query(QueryParams { 
-        first: params.first, 
-        skip: params.skip, 
-        orderBy: params.orderBy, 
-        orderDirection: params.orderDirection, 
-        where_clause: params.where_clause 
-    }), State(state)).await?.0;
+    let loan_accepteds = get_loan_accepteds(
+        Query(QueryParams {
+            first: params.first,
+            skip: params.skip,
+            orderBy: params.orderBy.clone(),
+            orderDirection: params.orderDirection.clone(),
+            where_clause: params.where_clause.clone(),
+        }),
+        State(state.clone()),
+    )
+    .await?
+    .0;
+
+    let loan_createds = get_loan_createds(
+        Query(QueryParams {
+            first: params.first,
+            skip: params.skip,
+            orderBy: params.orderBy.clone(),
+            orderDirection: params.orderDirection.clone(),
+            where_clause: params.where_clause.clone(),
+        }),
+        State(state.clone()),
+    )
+    .await?
+    .0;
+
+    let loan_liquidateds = get_loan_liquidateds(
+        Query(QueryParams {
+            first: params.first,
+            skip: params.skip,
+            orderBy: params.orderBy.clone(),
+            orderDirection: params.orderDirection.clone(),
+            where_clause: params.where_clause.clone(),
+        }),
+        State(state.clone()),
+    )
+    .await?
+    .0;
+
+    let loan_offer_cancelleds = get_loan_offer_cancelleds(
+        Query(QueryParams {
+            first: params.first,
+            skip: params.skip,
+            orderBy: params.orderBy.clone(),
+            orderDirection: params.orderDirection.clone(),
+            where_clause: params.where_clause.clone(),
+        }),
+        State(state.clone()),
+    )
+    .await?
+    .0;
+
+    let loan_offer_removeds = get_loan_offer_removeds(
+        Query(QueryParams {
+            first: params.first,
+            skip: params.skip,
+            orderBy: params.orderBy.clone(),
+            orderDirection: params.orderDirection.clone(),
+            where_clause: params.where_clause.clone(),
+        }),
+        State(state.clone()),
+    )
+    .await?
+    .0;
+
+    let loan_repaids = get_loan_repaids(
+        Query(QueryParams {
+            first: params.first,
+            skip: params.skip,
+            orderBy: params.orderBy.clone(),
+            orderDirection: params.orderDirection.clone(),
+            where_clause: params.where_clause.clone(),
+        }),
+        State(state.clone()),
+    )
+    .await?
+    .0;
+
+    let price_feed_sets = get_price_feed_sets(
+        Query(QueryParams {
+            first: params.first,
+            skip: params.skip,
+            orderBy: params.orderBy.clone(),
+            orderDirection: params.orderDirection.clone(),
+            where_clause: params.where_clause.clone(),
+        }),
+        State(state.clone()),
+    )
+    .await?
+    .0;
+
+    let protocol_stats_collection = get_protocol_stats(
+        Query(QueryParams {
+            first: params.first,
+            skip: params.skip,
+            orderBy: params.orderBy.clone(),
+            orderDirection: params.orderDirection.clone(),
+            where_clause: params.where_clause.clone(),
+        }),
+        State(state.clone()),
+    )
+    .await?
+    .0;
+
+    let tokens = get_tokens(
+        Query(QueryParams {
+            first: params.first,
+            skip: params.skip,
+            orderBy: params.orderBy,
+            orderDirection: params.orderDirection,
+            where_clause: params.where_clause,
+        }),
+        State(state),
+    )
+    .await?
+    .0;
 
     let response = MyQueryResponse {
         loan_accepteds,
@@ -490,6 +562,6 @@ async fn get_graphql_query(
     State(state): State<AppState>,
 ) -> Result<Json<SubgraphResponse<MyQueryResponse>>, StatusCode> {
     let data = get_combined_query(Query(params), State(state)).await?.0;
-    
+
     Ok(Json(SubgraphResponse { data }))
 }

@@ -13,7 +13,7 @@ use tower_http::cors::CorsLayer;
 use tracing::{info, warn};
 
 mod data_store;
-use data_store::DataStore;
+use data_store::{DataStore, Event, LoanSummary, Statistics};
 
 const API_PORT: u16 = 3001;
 
@@ -80,47 +80,12 @@ async fn main() {
         .expect("Server failed to start");
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Event {
-    pub event_name: String,
-    pub transaction_hash: String,
-    pub block_number: u64,
-    pub block_timestamp: u64,
-    pub log_index: u64,
-    pub contract_address: String,
-    pub topics: Vec<String>,
-    pub data: String,
-    pub decoded_data: Option<HashMap<String, serde_json::Value>>,
-}
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EventsResponse {
     pub events: Vec<Event>,
     pub total: usize,
     pub page: Option<u32>,
     pub limit: Option<u32>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct LoanSummary {
-    pub loan_id: String,
-    pub borrower: Option<String>,
-    pub lender: Option<String>,
-    pub amount: Option<String>,
-    pub collateral_amount: Option<String>,
-    pub status: String, // Created, Active, Repaid, Liquidated
-    pub created_at: u64,
-    pub events_count: usize,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Statistics {
-    pub total_events: usize,
-    pub total_loans: usize,
-    pub active_loans: usize,
-    pub total_volume: String,
-    pub event_types: HashMap<String, usize>,
-    pub recent_activity: Vec<Event>,
 }
 
 #[derive(Deserialize)]
