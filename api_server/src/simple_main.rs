@@ -10,13 +10,20 @@ use std::collections::HashMap;
 use tower_http::cors::CorsLayer;
 use tracing::info;
 
-const API_PORT: u16 = 3001;
+// Port configuration for Railway
+fn get_port() -> u16 {
+    std::env::var("PORT")
+        .unwrap_or_else(|_| "3001".to_string())
+        .parse()
+        .unwrap_or(3001)
+}
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
     
-    info!("🚀 Starting NeuroLend API Server on port {}", API_PORT);
+    let api_port = get_port();
+    info!("🚀 Starting NeuroLend API Server on port {}", api_port);
     
     let app = Router::new()
         // Event endpoints
@@ -29,11 +36,11 @@ async fn main() {
         // Add CORS middleware
         .layer(CorsLayer::permissive());
     
-    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", API_PORT))
+    let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", api_port))
         .await
         .expect("Failed to bind to address");
     
-    info!("🌐 API Server running at http://localhost:{}", API_PORT);
+    info!("🌐 API Server running at http://localhost:{}", api_port);
     info!("📊 Available endpoints:");
     info!("  GET /events - All events");
     info!("  GET /events/:event_type - Events by type");
