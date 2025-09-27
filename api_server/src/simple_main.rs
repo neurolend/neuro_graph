@@ -16,7 +16,7 @@ fn get_port() -> u16 {
         .unwrap_or_else(|_| "3001".to_string())
         .parse()
         .unwrap_or(3001);
-    
+
     println!("🔍 Environment PORT: {:?}", std::env::var("PORT"));
     println!("🚀 Using port: {}", port);
     port
@@ -43,7 +43,10 @@ async fn main() {
         .await
         .expect("Failed to bind to address");
 
-    info!("🌐 API Server running on 0.0.0.0:{} (Railway will proxy this)", api_port);
+    info!(
+        "🌐 API Server running on 0.0.0.0:{} (Railway will proxy this)",
+        api_port
+    );
     info!("📊 Available endpoints:");
     info!("  GET /events - All events");
     info!("  GET /events/:event_type - Events by type");

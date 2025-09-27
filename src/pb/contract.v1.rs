@@ -35,6 +35,13 @@ pub struct Events {
     pub neurolend_price_feed_sets: ::prost::alloc::vec::Vec<NeurolendPriceFeedSet>,
     #[prost(message, repeated, tag="16")]
     pub neurolend_price_update_paids: ::prost::alloc::vec::Vec<NeurolendPriceUpdatePaid>,
+    /// Additional events for comprehensive tracking
+    #[prost(message, repeated, tag="17")]
+    pub erc20_transfers: ::prost::alloc::vec::Vec<Erc20Transfer>,
+    #[prost(message, repeated, tag="18")]
+    pub erc20_approvals: ::prost::alloc::vec::Vec<Erc20Approval>,
+    #[prost(message, repeated, tag="19")]
+    pub generic_logs: ::prost::alloc::vec::Vec<GenericLog>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -799,5 +806,64 @@ pub struct NeurolendTransferOwnershipCall {
     pub call_success: bool,
     #[prost(bytes="vec", tag="6")]
     pub new_owner: ::prost::alloc::vec::Vec<u8>,
+}
+/// Additional event types for comprehensive tracking
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Erc20Transfer {
+    #[prost(string, tag="1")]
+    pub evt_tx_hash: ::prost::alloc::string::String,
+    #[prost(uint32, tag="2")]
+    pub evt_index: u32,
+    #[prost(message, optional, tag="3")]
+    pub evt_block_time: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(uint64, tag="4")]
+    pub evt_block_number: u64,
+    #[prost(bytes="vec", tag="5")]
+    pub contract_address: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="6")]
+    pub from: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="7")]
+    pub to: ::prost::alloc::vec::Vec<u8>,
+    #[prost(string, tag="8")]
+    pub value: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Erc20Approval {
+    #[prost(string, tag="1")]
+    pub evt_tx_hash: ::prost::alloc::string::String,
+    #[prost(uint32, tag="2")]
+    pub evt_index: u32,
+    #[prost(message, optional, tag="3")]
+    pub evt_block_time: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(uint64, tag="4")]
+    pub evt_block_number: u64,
+    #[prost(bytes="vec", tag="5")]
+    pub contract_address: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="6")]
+    pub owner: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", tag="7")]
+    pub spender: ::prost::alloc::vec::Vec<u8>,
+    #[prost(string, tag="8")]
+    pub value: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GenericLog {
+    #[prost(string, tag="1")]
+    pub evt_tx_hash: ::prost::alloc::string::String,
+    #[prost(uint32, tag="2")]
+    pub evt_index: u32,
+    #[prost(message, optional, tag="3")]
+    pub evt_block_time: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(uint64, tag="4")]
+    pub evt_block_number: u64,
+    #[prost(bytes="vec", tag="5")]
+    pub contract_address: ::prost::alloc::vec::Vec<u8>,
+    #[prost(bytes="vec", repeated, tag="6")]
+    pub topics: ::prost::alloc::vec::Vec<::prost::alloc::vec::Vec<u8>>,
+    #[prost(bytes="vec", tag="7")]
+    pub data: ::prost::alloc::vec::Vec<u8>,
 }
 // @@protoc_insertion_point(module)
