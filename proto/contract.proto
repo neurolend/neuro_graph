@@ -1,0 +1,406 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package contract.v1;
+message Events {
+    repeated Neurolend_CollateralAdded neurolend_collateral_addeds = 1;
+    repeated Neurolend_CollateralRemoved neurolend_collateral_removeds = 2;
+    repeated Neurolend_LoanAccepted neurolend_loan_accepteds = 3;
+    repeated Neurolend_LoanCreated neurolend_loan_createds = 4;
+    repeated Neurolend_LoanLiquidated neurolend_loan_liquidateds = 5;
+    repeated Neurolend_LoanMatched neurolend_loan_matcheds = 6;
+    repeated Neurolend_LoanOfferCancelled neurolend_loan_offer_cancelleds = 7;
+    repeated Neurolend_LoanOfferRemoved neurolend_loan_offer_removeds = 8;
+    repeated Neurolend_LoanRepaid neurolend_loan_repaids = 9;
+    repeated Neurolend_LoanRequestCancelled neurolend_loan_request_cancelleds = 10;
+    repeated Neurolend_LoanRequestCreated neurolend_loan_request_createds = 11;
+    repeated Neurolend_LoanRequestRemoved neurolend_loan_request_removeds = 12;
+    repeated Neurolend_OwnershipTransferred neurolend_ownership_transferreds = 13;
+    repeated Neurolend_PartialRepayment neurolend_partial_repayments = 14;
+    repeated Neurolend_PriceFeedSet neurolend_price_feed_sets = 15;
+    repeated Neurolend_PriceUpdatePaid neurolend_price_update_paids = 16;
+}
+message Calls {
+    repeated Neurolend_AcceptLoanOffer1call neurolend_call_accept_loan_offer_1s = 1;
+    repeated Neurolend_AcceptLoanOffer2call neurolend_call_accept_loan_offer_2s = 2;
+    repeated Neurolend_AddCollateralCall neurolend_call_add_collaterals = 3;
+    repeated Neurolend_CancelLoanOfferCall neurolend_call_cancel_loan_offers = 4;
+    repeated Neurolend_CancelLoanRequestCall neurolend_call_cancel_loan_requests = 5;
+    repeated Neurolend_CreateLoanOffer1call neurolend_call_create_loan_offer_1s = 6;
+    repeated Neurolend_CreateLoanOffer2call neurolend_call_create_loan_offer_2s = 7;
+    repeated Neurolend_CreateLoanRequest1call neurolend_call_create_loan_request_1s = 8;
+    repeated Neurolend_CreateLoanRequest2call neurolend_call_create_loan_request_2s = 9;
+    repeated Neurolend_FillLoanOffer1call neurolend_call_fill_loan_offer_1s = 10;
+    repeated Neurolend_FillLoanOffer2call neurolend_call_fill_loan_offer_2s = 11;
+    repeated Neurolend_FillLoanRequestCall neurolend_call_fill_loan_requests = 12;
+    repeated Neurolend_LiquidateLoanCall neurolend_call_liquidate_loans = 13;
+    repeated Neurolend_MakePartialRepaymentCall neurolend_call_make_partial_repayments = 14;
+    repeated Neurolend_RemoveCollateralCall neurolend_call_remove_collaterals = 15;
+    repeated Neurolend_RenounceOwnershipCall neurolend_call_renounce_ownerships = 16;
+    repeated Neurolend_RepayLoanCall neurolend_call_repay_loans = 17;
+    repeated Neurolend_SetTokenPriceFeedIdCall neurolend_call_set_token_price_feed_ids = 18;
+    repeated Neurolend_TransferOwnershipCall neurolend_call_transfer_ownerships = 19;
+}
+message EventsCalls {
+    Events events = 1;
+    Calls calls = 2;
+}
+message Neurolend_CollateralAdded {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string loan_id = 5;
+    bytes borrower = 6;
+    string amount = 7;
+    string new_collateral_ratio = 8;
+    string timestamp = 9;
+}
+message Neurolend_CollateralRemoved {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string loan_id = 5;
+    bytes borrower = 6;
+    string amount = 7;
+    string new_collateral_ratio = 8;
+    string timestamp = 9;
+}
+message Neurolend_LoanAccepted {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string loan_id = 5;
+    bytes borrower = 6;
+    string timestamp = 7;
+    string initial_collateral_ratio = 8;
+}
+message Neurolend_LoanCreated {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string loan_id = 5;
+    bytes lender = 6;
+    bytes token_address = 7;
+    string amount = 8;
+    string interest_rate = 9;
+    string duration = 10;
+    bytes collateral_address = 11;
+    string collateral_amount = 12;
+    string min_collateral_ratio_bps = 13;
+    string liquidation_threshold_bps = 14;
+    string max_price_staleness = 15;
+}
+message Neurolend_LoanLiquidated {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string loan_id = 5;
+    bytes liquidator = 6;
+    string collateral_claimed_by_lender = 7;
+    string liquidator_reward = 8;
+    string timestamp = 9;
+}
+message Neurolend_LoanMatched {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string loan_id = 5;
+    string offer_id = 6;
+    string request_id = 7;
+    bytes lender = 8;
+    bytes borrower = 9;
+    string amount = 10;
+    string interest_rate = 11;
+    string timestamp = 12;
+}
+message Neurolend_LoanOfferCancelled {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string loan_id = 5;
+    bytes lender = 6;
+    string timestamp = 7;
+}
+message Neurolend_LoanOfferRemoved {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string loan_id = 5;
+    string reason = 6;
+}
+message Neurolend_LoanRepaid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string loan_id = 5;
+    bytes borrower = 6;
+    string repayment_amount = 7;
+    string timestamp = 8;
+}
+message Neurolend_LoanRequestCancelled {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string request_id = 5;
+    bytes borrower = 6;
+    string timestamp = 7;
+}
+message Neurolend_LoanRequestCreated {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string request_id = 5;
+    bytes borrower = 6;
+    bytes token_address = 7;
+    string amount = 8;
+    string max_interest_rate = 9;
+    string duration = 10;
+    bytes collateral_address = 11;
+    string collateral_amount = 12;
+    string min_collateral_ratio_bps = 13;
+    string liquidation_threshold_bps = 14;
+    string max_price_staleness = 15;
+}
+message Neurolend_LoanRequestRemoved {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string request_id = 5;
+    string reason = 6;
+}
+message Neurolend_OwnershipTransferred {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    bytes previous_owner = 5;
+    bytes new_owner = 6;
+}
+message Neurolend_PartialRepayment {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string loan_id = 5;
+    bytes borrower = 6;
+    string repayment_amount = 7;
+    string total_repaid_amount = 8;
+    string remaining_amount = 9;
+    string timestamp = 10;
+}
+message Neurolend_PriceFeedSet {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    bytes token_address = 5;
+    bytes feed_id = 6;
+}
+message Neurolend_PriceUpdatePaid {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    string loan_id = 5;
+    string update_fee = 6;
+    string timestamp = 7;
+}
+  
+message Neurolend_AcceptLoanOffer1call {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string loan_id = 6;
+}
+message Neurolend_AcceptLoanOffer2call {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string loan_id = 6;
+    repeated bytes price_update = 7;
+}
+message Neurolend_AddCollateralCall {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string loan_id = 6;
+    string additional_amount = 7;
+}
+message Neurolend_CancelLoanOfferCall {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string loan_id = 6;
+}
+message Neurolend_CancelLoanRequestCall {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string request_id = 6;
+}
+message Neurolend_CreateLoanOffer1call {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    bytes u_token_address = 6;
+    string u_amount = 7;
+    string u_interest_rate = 8;
+    string u_duration = 9;
+    bytes u_collateral_address = 10;
+    string u_collateral_amount = 11;
+    string u_min_collateral_ratio_bps = 12;
+    string u_liquidation_threshold_bps = 13;
+    string u_max_price_staleness = 14;
+}
+message Neurolend_CreateLoanOffer2call {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    bytes u_token_address = 6;
+    string u_amount = 7;
+    string u_interest_rate = 8;
+    string u_duration = 9;
+    bytes u_collateral_address = 10;
+    string u_collateral_amount = 11;
+}
+message Neurolend_CreateLoanRequest1call {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    bytes u_token_address = 6;
+    string u_amount = 7;
+    string u_max_interest_rate = 8;
+    string u_duration = 9;
+    bytes u_collateral_address = 10;
+    string u_collateral_amount = 11;
+}
+message Neurolend_CreateLoanRequest2call {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    bytes u_token_address = 6;
+    string u_amount = 7;
+    string u_max_interest_rate = 8;
+    string u_duration = 9;
+    bytes u_collateral_address = 10;
+    string u_collateral_amount = 11;
+    string u_min_collateral_ratio_bps = 12;
+    string u_liquidation_threshold_bps = 13;
+    string u_max_price_staleness = 14;
+}
+message Neurolend_FillLoanOffer1call {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string offer_id = 6;
+}
+message Neurolend_FillLoanOffer2call {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string offer_id = 6;
+    repeated bytes price_update = 7;
+}
+message Neurolend_FillLoanRequestCall {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string request_id = 6;
+}
+message Neurolend_LiquidateLoanCall {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string loan_id = 6;
+    repeated bytes price_update = 7;
+}
+message Neurolend_MakePartialRepaymentCall {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string loan_id = 6;
+    string repayment_amount = 7;
+}
+message Neurolend_RemoveCollateralCall {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string loan_id = 6;
+    string remove_amount = 7;
+    repeated bytes price_update = 8;
+}
+message Neurolend_RenounceOwnershipCall {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+}
+message Neurolend_RepayLoanCall {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    string loan_id = 6;
+}
+message Neurolend_SetTokenPriceFeedIdCall {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    bytes u_token_address = 6;
+    bytes u_feed_id = 7;
+}
+message Neurolend_TransferOwnershipCall {
+    string call_tx_hash = 1;
+    google.protobuf.Timestamp call_block_time = 2;
+    uint64 call_block_number = 3;
+    uint64 call_ordinal = 4;
+    bool call_success = 5;
+    bytes new_owner = 6;
+}

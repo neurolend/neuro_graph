@@ -1,0 +1,54 @@
+specVersion: v0.1.0
+package:
+  name: neuro_graph
+  version: v0.1.0
+
+imports:
+  ethcommon: https://spkg.io/streamingfast/ethereum-common-v0.3.0.spkg
+
+protobuf:
+  files:
+    - contract.proto
+  importPaths:
+    - ./proto
+  excludePaths:
+    - sf/substreams
+    - google
+
+binaries:
+  default:
+    type: wasm/rust-v1
+    file: ./target/wasm32-unknown-unknown/release/substreams.wasm
+
+modules:
+  - name: map_events
+    kind: map
+    initialBlock: 6914309
+    blockFilter:
+      module: ethcommon:index_events
+      query:
+        string: evt_addr:0x064c3e0a900743d9ac87c778d2f6d3d5819d4f23
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:contract.v1.Events
+  - name: map_calls
+    kind: map
+    initialBlock: 6914309
+    blockFilter:
+      module: ethcommon:index_calls
+      query:
+        string: call_to:0x064c3e0a900743d9ac87c778d2f6d3d5819d4f23
+    inputs:
+      - source: sf.ethereum.type.v2.Block
+    output:
+      type: proto:contract.v1.Calls
+  - name: map_events_calls
+    kind: map
+    initialBlock: 6914309
+    inputs:
+      - map: map_events
+      - map: map_calls
+    output:
+      type: proto:contract.v1.EventsCalls
+network: 0g
