@@ -1,8 +1,0 @@
-[phases.build]
-cmds = ["cargo build --release --bin api_server"]
-
-[start]
-cmd = "./target/release/api_server"
-
-[variables]
-PORT = "3001"
