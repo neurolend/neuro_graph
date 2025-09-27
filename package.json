@@ -1,15 +1,33 @@
 {
-    "name": "neurolend-simple-indexer",
+    "name": "neurolend-indexer-api",
     "version": "1.0.0",
-    "description": "Simple Node.js indexer for NeuroLend contract events",
-    "main": "simple_indexer.js",
+    "description": "NeuroLend blockchain indexer and API server",
+    "main": "simple_api.js",
     "scripts": {
-        "start": "node simple_indexer.js",
-        "api": "node simple_api.js"
+        "start": "node simple_api.js",
+        "indexer": "node simple_indexer.js",
+        "dev": "concurrently \"npm run indexer\" \"npm run start\"",
+        "api": "node simple_api.js",
+        "test": "echo \"No tests specified\" && exit 0"
     },
     "dependencies": {
-        "ethers": "^6.8.0",
         "express": "^4.18.2",
-        "cors": "^2.8.5"
-    }
+        "cors": "^2.8.5",
+        "ethers": "^6.8.0"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "keywords": [
+        "blockchain",
+        "indexer",
+        "ethereum",
+        "defi",
+        "lending"
+    ],
+    "author": "NeuroLend Team",
+    "license": "MIT"
 }

@@ -1,0 +1,50 @@
+version: "3.8"
+
+services:
+  indexer:
+    build: .
+    command: npm run indexer
+    environment:
+      - RPC_URL=https://evmrpc.0g.ai
+      - CONTRACT_ADDRESS=0x064c3e0a900743d9ac87c778d2f6d3d5819d4f23
+      - STARTING_BLOCK=6914309
+      - BATCH_SIZE=100
+      - OUTPUT_DIR=/app/indexer_output
+    volumes:
+      - indexer_data:/app/indexer_output
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "test", "-f", "/app/indexer_output/indexer_state.json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  api:
+    build: .
+    command: npm start
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - INDEXER_OUTPUT_DIR=/app/indexer_output
+    volumes:
+      - indexer_data:/app/indexer_output
+    depends_on:
+      - indexer
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3001/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  indexer_data:

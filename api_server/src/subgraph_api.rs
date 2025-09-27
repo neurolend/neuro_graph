@@ -29,7 +29,19 @@ pub struct QueryParams {
 
 pub fn create_subgraph_router(app_state: AppState) -> Router {
     Router::new()
-        // Individual entity endpoints (subgraph style)
+        // API endpoints matching Node.js simple_api.js structure
+        .route("/api/loanAccepteds", get(get_loan_accepteds))
+        .route("/api/loanCreateds", get(get_loan_createds))
+        .route("/api/loanLiquidateds", get(get_loan_liquidateds))
+        .route("/api/loanOfferCancelleds", get(get_loan_offer_cancelleds))
+        .route("/api/loanOfferRemoveds", get(get_loan_offer_removeds))
+        .route("/api/loanRepaids", get(get_loan_repaids))
+        .route("/api/priceFeedSets", get(get_price_feed_sets))
+        .route("/api/events", get(get_all_events))
+        .route("/api/stats", get(get_stats_compat))
+        // Health check (no /api prefix like Node.js version)
+        .route("/health", get(health_check))
+        // Keep original endpoints for backward compatibility
         .route("/loanAccepteds", get(get_loan_accepteds))
         .route("/loanCreateds", get(get_loan_createds))
         .route("/loanLiquidateds", get(get_loan_liquidateds))
@@ -39,12 +51,8 @@ pub fn create_subgraph_router(app_state: AppState) -> Router {
         .route("/priceFeedSets", get(get_price_feed_sets))
         .route("/protocolStats_collection", get(get_protocol_stats))
         .route("/tokens", get(get_tokens))
-        // Combined query endpoint (like your subgraph query)
         .route("/query", get(get_combined_query))
-        // GraphQL-style endpoint
         .route("/graphql", get(get_graphql_query))
-        // Health check
-        .route("/health", get(health_check))
         .layer(CorsLayer::permissive())
         .with_state(app_state)
 }
@@ -564,4 +572,54 @@ async fn get_graphql_query(
     let data = get_combined_query(Query(params), State(state)).await?.0;
 
     Ok(Json(SubgraphResponse { data }))
+}
+
+// Get all events endpoint (matching Node.js simple_api.js)
+async fn get_all_events(
+    Query(params): Query<QueryParams>,
+    State(state): State<AppState>,
+) -> Result<Json<serde_json::Value>, StatusCode> {
+    let data_store = state.read().await;
+    let events = data_store.get_events(None, None, None);
+
+    // Apply pagination if specified
+    let limit = params.first.unwrap_or(100) as usize;
+    let offset = params.skip.unwrap_or(0) as usize;
+
+    let total = events.len();
+    let paginated_events: Vec<_> = events.into_iter().skip(offset).take(limit).collect();
+
+    // Format like Node.js version
+    Ok(Json(serde_json::json!({
+        "events": paginated_events,
+        "total": total,
+        "limit": limit,
+        "offset": offset
+    })))
+}
+
+// Stats endpoint compatible with Node.js simple_api.js
+async fn get_stats_compat(
+    State(state): State<AppState>,
+) -> Result<Json<serde_json::Value>, StatusCode> {
+    let data_store = state.read().await;
+    let events = data_store.get_events(None, None, None);
+
+    // Count events by type
+    let mut event_types = std::collections::HashMap::new();
+    let mut latest_block = 0u64;
+
+    for event in &events {
+        *event_types.entry(event.event_name.clone()).or_insert(0) += 1;
+        if event.block_number > latest_block {
+            latest_block = event.block_number;
+        }
+    }
+
+    // Format like Node.js version
+    Ok(Json(serde_json::json!({
+        "total_events": events.len(),
+        "event_types": event_types,
+        "latest_block": latest_block
+    })))
 }

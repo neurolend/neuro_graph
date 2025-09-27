@@ -1,0 +1,17 @@
+[
+  {
+    "event_name": "LoanCreated",
+    "transaction_hash": "0xtest123456789abcdef",
+    "block_number": 7039846,
+    "block_timestamp": 1759008000,
+    "log_index": 0,
+    "contract_address": "0xD9aB5190eFA86eB955C5e146ccb30421faBc3405",
+    "topics": [
+      "0x1234567890abcdef",
+      "0x0000000000000000000000000000000000000001",
+      "0x0000000000000000000000000000000000000002",
+      "0x0000000000000000000000004200000000000000000000000000000000000006"
+    ],
+    "data": "0x1234567890abcdef"
+  }
+]
