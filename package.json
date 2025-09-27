@@ -1,0 +1,15 @@
+{
+    "name": "neurolend-simple-indexer",
+    "version": "1.0.0",
+    "description": "Simple Node.js indexer for NeuroLend contract events",
+    "main": "simple_indexer.js",
+    "scripts": {
+        "start": "node simple_indexer.js",
+        "api": "node simple_api.js"
+    },
+    "dependencies": {
+        "ethers": "^6.8.0",
+        "express": "^4.18.2",
+        "cors": "^2.8.5"
+    }
+}

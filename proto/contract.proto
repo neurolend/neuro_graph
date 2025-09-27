@@ -20,6 +20,10 @@ message Events {
     repeated Neurolend_PartialRepayment neurolend_partial_repayments = 14;
     repeated Neurolend_PriceFeedSet neurolend_price_feed_sets = 15;
     repeated Neurolend_PriceUpdatePaid neurolend_price_update_paids = 16;
+    // Additional events for comprehensive tracking
+    repeated ERC20_Transfer erc20_transfers = 17;
+    repeated ERC20_Approval erc20_approvals = 18;
+    repeated Generic_Log generic_logs = 19;
 }
 message Calls {
     repeated Neurolend_AcceptLoanOffer1call neurolend_call_accept_loan_offer_1s = 1;
@@ -403,4 +407,37 @@ message Neurolend_TransferOwnershipCall {
     uint64 call_ordinal = 4;
     bool call_success = 5;
     bytes new_owner = 6;
+}
+
+// Additional event types for comprehensive tracking
+message ERC20_Transfer {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    bytes contract_address = 5;
+    bytes from = 6;
+    bytes to = 7;
+    string value = 8;
+}
+
+message ERC20_Approval {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    bytes contract_address = 5;
+    bytes owner = 6;
+    bytes spender = 7;
+    string value = 8;
+}
+
+message Generic_Log {
+    string evt_tx_hash = 1;
+    uint32 evt_index = 2;
+    google.protobuf.Timestamp evt_block_time = 3;
+    uint64 evt_block_number = 4;
+    bytes contract_address = 5;
+    repeated bytes topics = 6;
+    bytes data = 7;
 }

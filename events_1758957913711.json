@@ -1,0 +1,67 @@
+[
+  {
+    "event_name": "OwnershipTransferred",
+    "transaction_hash": "0xfa99be65487160e97981031ae4383a81b39ef91aec4368dee0461f57bd8def6c",
+    "block_number": 6914309,
+    "block_timestamp": 1758919051,
+    "contract_address": "0x064c3e0a900743D9Ac87c778d2f6d3d5819D4f23",
+    "topics": [
+      "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+      "0x0000000000000000000000000000000000000000000000000000000000000000",
+      "0x000000000000000000000000f6ee7b6f0170be39a344f21241d5ad8b89960407"
+    ],
+    "data": "0x"
+  },
+  {
+    "event_name": "PriceFeedSet",
+    "transaction_hash": "0xfa99be65487160e97981031ae4383a81b39ef91aec4368dee0461f57bd8def6c",
+    "block_number": 6914309,
+    "block_timestamp": 1758919051,
+    "contract_address": "0x064c3e0a900743D9Ac87c778d2f6d3d5819D4f23",
+    "topics": [
+      "0x65e4ba705db6091cf209ad98e61b9b8203308a9bb349e9add9809174481dbd62",
+      "0x0000000000000000000000001cd0690ff9a693f5ef2dd976660a8dafc81a109c",
+      "0xfa9e8d4591613476ad0961732475dc08969d248faca270cc6c47efe009ea3070"
+    ],
+    "data": "0x"
+  },
+  {
+    "event_name": "PriceFeedSet",
+    "transaction_hash": "0xfa99be65487160e97981031ae4383a81b39ef91aec4368dee0461f57bd8def6c",
+    "block_number": 6914309,
+    "block_timestamp": 1758919051,
+    "contract_address": "0x064c3e0a900743D9Ac87c778d2f6d3d5819D4f23",
+    "topics": [
+      "0x65e4ba705db6091cf209ad98e61b9b8203308a9bb349e9add9809174481dbd62",
+      "0x0000000000000000000000009cc1d782e6dfe5936204c3295cb430e641dcf300",
+      "0x9d4294bbcd1174d6f2003ec365831e64cc31d9f6f15a2b85399db8d5000960f6"
+    ],
+    "data": "0x"
+  },
+  {
+    "event_name": "PriceFeedSet",
+    "transaction_hash": "0xfa99be65487160e97981031ae4383a81b39ef91aec4368dee0461f57bd8def6c",
+    "block_number": 6914309,
+    "block_timestamp": 1758919051,
+    "contract_address": "0x064c3e0a900743D9Ac87c778d2f6d3d5819D4f23",
+    "topics": [
+      "0x65e4ba705db6091cf209ad98e61b9b8203308a9bb349e9add9809174481dbd62",
+      "0x000000000000000000000000161a128567bf0c005b58211757f7e46eed983f02",
+      "0x6df640f3b8963d8f8358f791f352b8364513f6ab1cca5ed3f1f7b5448980e784"
+    ],
+    "data": "0x"
+  },
+  {
+    "event_name": "PriceFeedSet",
+    "transaction_hash": "0xfa99be65487160e97981031ae4383a81b39ef91aec4368dee0461f57bd8def6c",
+    "block_number": 6914309,
+    "block_timestamp": 1758919051,
+    "contract_address": "0x064c3e0a900743D9Ac87c778d2f6d3d5819D4f23",
+    "topics": [
+      "0x65e4ba705db6091cf209ad98e61b9b8203308a9bb349e9add9809174481dbd62",
+      "0x0000000000000000000000001f3aa82227281ca364bfb3d253b0f1af1da6473e",
+      "0xeaa020c61cc479712813461ce153894a96a6c00b21ed0cfc2798d1f9a9e9c94a"
+    ],
+    "data": "0x"
+  }
+]

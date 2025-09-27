@@ -15,6 +15,12 @@ substreams_ethereum::init!();
 
 const NEUROLEND_TRACKED_CONTRACT: [u8; 20] = hex!("064c3e0a900743d9ac87c778d2f6d3d5819d4f23");
 
+// ERC20 Transfer event signature: Transfer(address,address,uint256)
+const ERC20_TRANSFER_EVENT_SIG: [u8; 32] = hex!("ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef");
+
+// ERC20 Approval event signature: Approval(address,address,uint256)  
+const ERC20_APPROVAL_EVENT_SIG: [u8; 32] = hex!("8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925");
+
 fn map_neurolend_events(blk: &eth::Block, events: &mut contract::Events) {
     events.neurolend_collateral_addeds.append(
         &mut blk
@@ -517,6 +523,130 @@ fn map_neurolend_events(blk: &eth::Block, events: &mut contract::Events) {
             .collect(),
     );
 }
+
+fn map_erc20_events(blk: &eth::Block, events: &mut contract::Events) {
+    // Track ERC20 Transfer events
+    events.erc20_transfers.append(
+        &mut blk
+            .receipts()
+            .flat_map(|view| {
+                view.receipt
+                    .logs
+                    .iter()
+                    .filter(|log| {
+                        // Check if this is an ERC20 Transfer event
+                        log.topics.len() >= 3 && 
+                        log.topics[0] == ERC20_TRANSFER_EVENT_SIG
+                    })
+                    .filter_map(|log| {
+                        // Decode ERC20 Transfer event
+                        if log.topics.len() >= 3 && log.data.len() >= 32 {
+                            let from = if log.topics[1] == [0u8; 32] {
+                                vec![0u8; 20] // Zero address for minting
+                            } else {
+                                log.topics[1][12..32].to_vec() // Last 20 bytes for address
+                            };
+                            
+                            let to = if log.topics[2] == [0u8; 32] {
+                                vec![0u8; 20] // Zero address for burning
+                            } else {
+                                log.topics[2][12..32].to_vec() // Last 20 bytes for address
+                            };
+                            
+                            // Parse value from data (first 32 bytes)
+                            let value_bytes = &log.data[0..32];
+                            let value = substreams::scalar::BigInt::from_unsigned_bytes_be(value_bytes);
+                            
+                            return Some(contract::Erc20Transfer {
+                                evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                                evt_index: log.block_index,
+                                evt_block_time: Some(blk.timestamp().to_owned()),
+                                evt_block_number: blk.number,
+                                contract_address: log.address.to_vec(),
+                                from,
+                                to,
+                                value: value.to_string(),
+                            });
+                        }
+                        None
+                    })
+            })
+            .collect(),
+    );
+
+    // Track ERC20 Approval events
+    events.erc20_approvals.append(
+        &mut blk
+            .receipts()
+            .flat_map(|view| {
+                view.receipt
+                    .logs
+                    .iter()
+                    .filter(|log| {
+                        // Check if this is an ERC20 Approval event
+                        log.topics.len() >= 3 && 
+                        log.topics[0] == ERC20_APPROVAL_EVENT_SIG
+                    })
+                    .filter_map(|log| {
+                        // Decode ERC20 Approval event
+                        if log.topics.len() >= 3 && log.data.len() >= 32 {
+                            let owner = log.topics[1][12..32].to_vec(); // Last 20 bytes for address
+                            let spender = log.topics[2][12..32].to_vec(); // Last 20 bytes for address
+                            
+                            // Parse value from data (first 32 bytes)
+                            let value_bytes = &log.data[0..32];
+                            let value = substreams::scalar::BigInt::from_unsigned_bytes_be(value_bytes);
+                            
+                            return Some(contract::Erc20Approval {
+                                evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                                evt_index: log.block_index,
+                                evt_block_time: Some(blk.timestamp().to_owned()),
+                                evt_block_number: blk.number,
+                                contract_address: log.address.to_vec(),
+                                owner,
+                                spender,
+                                value: value.to_string(),
+                            });
+                        }
+                        None
+                    })
+            })
+            .collect(),
+    );
+}
+
+fn map_generic_events(blk: &eth::Block, events: &mut contract::Events) {
+    // Track all other events as generic logs for completeness
+    events.generic_logs.append(
+        &mut blk
+            .receipts()
+            .flat_map(|view| {
+                view.receipt
+                    .logs
+                    .iter()
+                    .filter(|log| {
+                        // Skip events we already handle specifically
+                        log.address != NEUROLEND_TRACKED_CONTRACT &&
+                        !(log.topics.len() >= 1 && 
+                          (log.topics[0] == ERC20_TRANSFER_EVENT_SIG || 
+                           log.topics[0] == ERC20_APPROVAL_EVENT_SIG))
+                    })
+                    .map(|log| {
+                        contract::GenericLog {
+                            evt_tx_hash: Hex(&view.transaction.hash).to_string(),
+                            evt_index: log.block_index,
+                            evt_block_time: Some(blk.timestamp().to_owned()),
+                            evt_block_number: blk.number,
+                            contract_address: log.address.to_vec(),
+                            topics: log.topics.iter().map(|topic| topic.to_vec()).collect(),
+                            data: log.data.clone(),
+                        }
+                    })
+            })
+            .collect(),
+    );
+}
+
 fn map_neurolend_calls(blk: &eth::Block, calls: &mut contract::Calls) {
     calls.neurolend_call_accept_loan_offer_1s.append(
         &mut blk
@@ -1115,6 +1245,8 @@ fn map_events_calls(
 fn map_events(blk: eth::Block) -> Result<contract::Events, substreams::errors::Error> {
     let mut events = contract::Events::default();
     map_neurolend_events(&blk, &mut events);
+    map_erc20_events(&blk, &mut events);
+    map_generic_events(&blk, &mut events);
     Ok(events)
 }
 #[substreams::handlers::map]
