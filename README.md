@@ -1,39 +1,73 @@
-# neuro_graph Substreams modules
+# 🧠 NeuroLend Indexer & API
 
-This package was initialized via `substreams init`, using the `evm-events-calls` template.
+A complete blockchain indexing solution for NeuroLend protocol on **0G Network**, featuring custom indexer and REST API since 0G lacks Substreams infrastructure.
 
-## Usage
+## **Quick Start**
 
-```bash
-substreams build
-substreams auth
-substreams gui       			  # Get streaming!
-```
-
-Optionally, you can publish your Substreams to the [Substreams Registry](https://substreams.dev).
+### **Option 1: Docker (Recommended)**
 
 ```bash
-substreams registry login         # Login to substreams.dev
-substreams registry publish       # Publish your Substreams to substreams.dev
+cd deployment && docker-compose up --build
 ```
 
-## Modules
+### **Option 2: Local Development**
 
-All of these modules produce data filtered by these contracts:
-- _neurolend_ at **0x064c3e0a900743d9ac87c778d2f6d3d5819d4f23**
-### `map_events_calls`
+```bash
+# Terminal 1: Start indexer
+cd custom_indexer && cargo run --bin neurolend_indexer
 
-This module gets you events _and_ calls
+# Terminal 2: Start API server
+cd api_server && cargo run --bin api_server
+```
 
+## 🏗️ **Architecture**
 
-### `map_events`
+- **Custom Indexer**: Replaces Substreams, fetches events from 0G Network RPC
+- **REST API**: Serves indexed data to frontends via HTTP endpoints
+- **Event Processing**: Tracks 16 NeuroLend events (LoanCreated, CollateralAdded, etc.)
+- **Real-time Monitoring**: Continuous blockchain scanning + historical processing
 
-This module gets you only events that matched.
+## **API Endpoints**
 
+Base URL: `http://localhost:3001`
 
+| Endpoint                  | Description          |
+| ------------------------- | -------------------- |
+| `GET /events`             | All NeuroLend events |
+| `GET /events/LoanCreated` | Specific event type  |
+| `GET /loans`              | Aggregated loan data |
+| `GET /stats`              | Protocol statistics  |
+| `GET /health`             | Service health check |
 
-### `map_calls`
+## 🌐 **NeuroLend Contract**
 
-This module gets you only calls that matched.
+**Address**: `0x064c3e0a900743d9ac87c778d2f6d3d5819d4f23`  
+**Network**: 0G Network (Chain ID: 16661)  
+**RPC**: https://evmrpc.0g.ai  
+**Starting Block**: 6,914,309
 
+## 🔧 **Components**
 
+- **`custom_indexer/`**: Rust indexer for 0G Network
+- **`api_server/`**: REST API server with CORS support
+- **`deployment/`**: Docker configs and deployment scripts
+- **`abi/`**: NeuroLend contract ABI definitions
+
+## 💡 **Why Custom Solution?**
+
+0G Network lacks Substreams/Firehose infrastructure, so we built:
+
+- ✅ Direct RPC integration
+- ✅ Batch processing (1000 blocks/batch)
+- ✅ Real-time event monitoring
+- ✅ REST API for frontend integration
+- ✅ Docker containerization
+
+## 🎯 **Frontend Integration**
+
+```javascript
+const events = await fetch("http://your-api/events").then((r) => r.json());
+const loans = await fetch("http://your-api/loans").then((r) => r.json());
+```
+
+Built for 0G Network using The Graph Substream as Track • Powered by Rust • Ready for Production 🚀
