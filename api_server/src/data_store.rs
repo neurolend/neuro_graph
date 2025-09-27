@@ -1,6 +1,42 @@
-use crate::{Event, LoanSummary, Statistics};
-use serde_json;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct Event {
+    pub event_name: String,
+    pub transaction_hash: String,
+    pub block_number: u64,
+    pub block_timestamp: u64,
+    pub log_index: u64,
+    pub contract_address: String,
+    pub topics: Vec<String>,
+    pub data: String,
+    pub decoded_data: Option<HashMap<String, serde_json::Value>>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct LoanSummary {
+    pub loan_id: String,
+    pub borrower: Option<String>,
+    pub lender: Option<String>,
+    pub amount: Option<String>,
+    pub collateral_amount: Option<String>,
+    pub status: String, // Created, Active, Repaid, Liquidated
+    pub created_at: u64,
+    pub events_count: usize,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Statistics {
+    pub total_events: usize,
+    pub total_loans: usize,
+    pub active_loans: usize,
+    pub total_volume: String,
+    pub event_types: HashMap<String, usize>,
+    pub recent_activity: Vec<Event>,
+}
+
+use serde_json;
 use std::fs;
 use std::path::Path;
 use tracing::{error, info, warn};

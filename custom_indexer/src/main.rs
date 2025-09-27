@@ -2,6 +2,8 @@ use anyhow::Result;
 use ethers::prelude::*;
 use serde_json::json;
 use std::collections::HashMap;
+use std::fs;
+use std::path::Path;
 use std::sync::Arc;
 use tracing::{error, info, warn};
 
@@ -42,12 +44,20 @@ struct NeuroLendIndexer {
     provider: Arc<Provider<Http>>,
     contract_address: Address,
     event_signatures: HashMap<H256, &'static str>,
+    output_dir: String,
 }
 
 impl NeuroLendIndexer {
     async fn new(provider: Arc<Provider<Http>>) -> Result<Self> {
         let contract_address = NEUROLEND_CONTRACT.parse()?;
         let event_signatures = event_signatures::get_event_signatures();
+        let output_dir = "output".to_string();
+
+        // Create output directory if it doesn't exist
+        if !Path::new(&output_dir).exists() {
+            fs::create_dir_all(&output_dir)?;
+            info!("Created output directory: {}", output_dir);
+        }
 
         info!("Loaded {} event signatures", event_signatures.len());
 
@@ -55,6 +65,7 @@ impl NeuroLendIndexer {
             provider,
             contract_address,
             event_signatures,
+            output_dir,
         })
     }
 
@@ -214,12 +225,11 @@ impl NeuroLendIndexer {
                     "data": format!("0x{}", hex::encode(&log.data))
                 });
 
-                // Here you can:
-                // 1. Save to database
-                // 2. Send to message queue
-                // 3. Process with your existing logic
-                // 4. Export to JSON/CSV
+                // Save event to JSON file
+                self.save_event_to_file(&event_data, event_name, block_number)
+                    .await?;
 
+                // Also print to console for debugging
                 println!("{}", serde_json::to_string_pretty(&event_data)?);
             }
             None => {
@@ -232,5 +242,33 @@ impl NeuroLendIndexer {
 
     fn identify_event(&self, signature: &H256) -> Option<&'static str> {
         self.event_signatures.get(signature).copied()
+    }
+
+    async fn save_event_to_file(
+        &self,
+        event_data: &serde_json::Value,
+        event_name: &str,
+        block_number: u64,
+    ) -> Result<()> {
+        // Create filename with timestamp and block number for uniqueness
+        let timestamp = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)?
+            .as_millis();
+
+        let filename = format!(
+            "{}_{}_{}_{}.json",
+            event_name,
+            block_number,
+            timestamp,
+            rand::random::<u32>()
+        );
+        let filepath = Path::new(&self.output_dir).join(filename);
+
+        // Save the event data to file
+        let json_string = serde_json::to_string_pretty(event_data)?;
+        fs::write(&filepath, json_string)?;
+
+        info!("Saved {} event to file: {:?}", event_name, filepath);
+        Ok(())
     }
 }

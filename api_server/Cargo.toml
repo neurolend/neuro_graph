@@ -21,3 +21,7 @@ ethers = "2.0"
 [[bin]]
 name = "api_server"
 path = "src/simple_main.rs"
+
+[[bin]]
+name = "subgraph_api"
+path = "src/subgraph_main.rs"

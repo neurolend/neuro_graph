@@ -1,0 +1,14 @@
+{
+  "block_number": 6914309,
+  "block_timestamp": 1758919051,
+  "contract_address": "0x064c3e0a900743d9ac87c778d2f6d3d5819d4f23",
+  "data": "0x",
+  "event_name": "OwnershipTransferred",
+  "log_index": 0,
+  "topics": [
+    "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+    "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "0x000000000000000000000000f6ee7b6f0170be39a344f21241d5ad8b89960407"
+  ],
+  "transaction_hash": "0xfa99be65487160e97981031ae4383a81b39ef91aec4368dee0461f57bd8def6c"
+}
