@@ -101,7 +101,7 @@ pub struct EventsResponse {
     pub limit: Option<u32>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct LoanSummary {
     pub loan_id: String,
     pub borrower: Option<String>,
@@ -201,11 +201,10 @@ async fn get_all_events(
 async fn get_events_by_type(
     Path(event_type): Path<String>,
     Query(params): Query<QueryParams>,
+    State(state): State<AppState>,
 ) -> Result<Json<EventsResponse>, StatusCode> {
-    let events: Vec<Event> = get_mock_events()
-        .into_iter()
-        .filter(|e| e.event_name.eq_ignore_ascii_case(&event_type))
-        .collect();
+    let data_store = state.read().await;
+    let events = data_store.get_events(Some(&event_type), None, None);
 
     let total = events.len();
 
@@ -219,18 +218,10 @@ async fn get_events_by_type(
 
 async fn get_events_by_loan(
     Path(loan_id): Path<String>,
+    State(state): State<AppState>,
 ) -> Result<Json<EventsResponse>, StatusCode> {
-    let events: Vec<Event> = get_mock_events()
-        .into_iter()
-        .filter(|e| {
-            if let Some(decoded) = &e.decoded_data {
-                if let Some(id) = decoded.get("loanId") {
-                    return id.as_str() == Some(&loan_id);
-                }
-            }
-            false
-        })
-        .collect();
+    let data_store = state.read().await;
+    let events = data_store.get_events(None, Some(&loan_id), None);
 
     let total = events.len();
 
@@ -244,22 +235,10 @@ async fn get_events_by_loan(
 
 async fn get_events_by_user(
     Path(address): Path<String>,
+    State(state): State<AppState>,
 ) -> Result<Json<EventsResponse>, StatusCode> {
-    let events: Vec<Event> = get_mock_events()
-        .into_iter()
-        .filter(|e| {
-            if let Some(decoded) = &e.decoded_data {
-                return decoded.values().any(|v| {
-                    if let Some(addr) = v.as_str() {
-                        addr.eq_ignore_ascii_case(&address)
-                    } else {
-                        false
-                    }
-                });
-            }
-            false
-        })
-        .collect();
+    let data_store = state.read().await;
+    let events = data_store.get_events(None, None, Some(&address));
 
     let total = events.len();
 
@@ -317,8 +296,9 @@ async fn get_loans_by_user(Path(address): Path<String>) -> Json<Vec<LoanSummary>
     Json(loans)
 }
 
-async fn get_statistics() -> Json<Statistics> {
-    let events = get_mock_events();
+async fn get_statistics(State(state): State<AppState>) -> Json<Statistics> {
+    let data_store = state.read().await;
+    let events = data_store.get_events(None, None, None);
     let mut event_types = HashMap::new();
 
     for event in &events {
@@ -335,20 +315,11 @@ async fn get_statistics() -> Json<Statistics> {
     })
 }
 
-async fn get_user_statistics(Path(address): Path<String>) -> Json<Statistics> {
-    // Mock user stats - replace with real aggregation
-    Json(Statistics {
-        total_events: 3,
-        total_loans: 1,
-        active_loans: 1,
-        total_volume: "1000000000000000000".to_string(),
-        event_types: {
-            let mut map = HashMap::new();
-            map.insert("LoanCreated".to_string(), 1);
-            map.insert("CollateralAdded".to_string(), 1);
-            map.insert("LoanAccepted".to_string(), 1);
-            map
-        },
-        recent_activity: get_mock_events().into_iter().take(3).collect(),
-    })
+async fn get_user_statistics(
+    Path(address): Path<String>,
+    State(state): State<AppState>,
+) -> Json<Statistics> {
+    let data_store = state.read().await;
+    let user_stats = data_store.get_user_statistics(&address);
+    Json(user_stats)
 }
