@@ -21,10 +21,10 @@ fn get_port() -> u16 {
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
-    
+
     let api_port = get_port();
     info!("🚀 Starting NeuroLend API Server on port {}", api_port);
-    
+
     let app = Router::new()
         // Event endpoints
         .route("/events", get(get_all_events))
@@ -32,14 +32,13 @@ async fn main() {
         .route("/loans", get(get_all_loans))
         .route("/stats", get(get_statistics))
         .route("/health", get(health_check))
-        
         // Add CORS middleware
         .layer(CorsLayer::permissive());
-    
+
     let listener = tokio::net::TcpListener::bind(format!("0.0.0.0:{}", api_port))
         .await
         .expect("Failed to bind to address");
-    
+
     info!("🌐 API Server running at http://localhost:{}", api_port);
     info!("📊 Available endpoints:");
     info!("  GET /events - All events");
@@ -47,8 +46,10 @@ async fn main() {
     info!("  GET /loans - All loans");
     info!("  GET /stats - Statistics");
     info!("  GET /health - Health check");
-    
-    axum::serve(listener, app).await.expect("Server failed to start");
+
+    axum::serve(listener, app)
+        .await
+        .expect("Server failed to start");
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -104,7 +105,9 @@ async fn health_check() -> Json<serde_json::Value> {
     }))
 }
 
-async fn get_all_events(Query(params): Query<QueryParams>) -> Result<Json<EventsResponse>, StatusCode> {
+async fn get_all_events(
+    Query(params): Query<QueryParams>,
+) -> Result<Json<EventsResponse>, StatusCode> {
     // Mock events representing your loan creation
     let events = vec![
         Event {
@@ -130,40 +133,40 @@ async fn get_all_events(Query(params): Query<QueryParams>) -> Result<Json<Events
             borrower: Some("0xYourAddress...".to_string()),
             lender: None,
             amount: Some("2000000000000000000".to_string()), // 2 ETH collateral
-        }
+        },
     ];
-    
+
     let limit = params.limit.unwrap_or(50).min(1000);
     let limited_events = events.into_iter().take(limit as usize).collect::<Vec<_>>();
     let total = limited_events.len();
-    
+
     Ok(Json(EventsResponse {
         events: limited_events,
         total,
     }))
 }
 
-async fn get_events_by_type(Path(event_type): Path<String>) -> Result<Json<EventsResponse>, StatusCode> {
-    let all_events = vec![
-        Event {
-            event_name: "LoanCreated".to_string(),
-            transaction_hash: "0x1234567890abcdef...".to_string(),
-            block_number: 6937000,
-            block_timestamp: chrono::Utc::now().timestamp() as u64 - 3600,
-            log_index: 0,
-            contract_address: "0x064c3e0a900743d9ac87c778d2f6d3d5819d4f23".to_string(),
-            loan_id: Some("1".to_string()),
-            borrower: Some("0xYourAddress...".to_string()),
-            lender: None,
-            amount: Some("1000000000000000000".to_string()),
-        },
-    ];
-    
+async fn get_events_by_type(
+    Path(event_type): Path<String>,
+) -> Result<Json<EventsResponse>, StatusCode> {
+    let all_events = vec![Event {
+        event_name: "LoanCreated".to_string(),
+        transaction_hash: "0x1234567890abcdef...".to_string(),
+        block_number: 6937000,
+        block_timestamp: chrono::Utc::now().timestamp() as u64 - 3600,
+        log_index: 0,
+        contract_address: "0x064c3e0a900743d9ac87c778d2f6d3d5819d4f23".to_string(),
+        loan_id: Some("1".to_string()),
+        borrower: Some("0xYourAddress...".to_string()),
+        lender: None,
+        amount: Some("1000000000000000000".to_string()),
+    }];
+
     let filtered_events: Vec<Event> = all_events
         .into_iter()
         .filter(|e| e.event_name.eq_ignore_ascii_case(&event_type))
         .collect();
-    
+
     Ok(Json(EventsResponse {
         total: filtered_events.len(),
         events: filtered_events,
@@ -171,18 +174,16 @@ async fn get_events_by_type(Path(event_type): Path<String>) -> Result<Json<Event
 }
 
 async fn get_all_loans() -> Json<Vec<LoanSummary>> {
-    let loans = vec![
-        LoanSummary {
-            loan_id: "1".to_string(),
-            borrower: Some("0xYourAddress...".to_string()),
-            lender: None,
-            amount: Some("1000000000000000000".to_string()),
-            status: "Active".to_string(),
-            created_at: chrono::Utc::now().timestamp() as u64 - 3600,
-            events_count: 2,
-        }
-    ];
-    
+    let loans = vec![LoanSummary {
+        loan_id: "1".to_string(),
+        borrower: Some("0xYourAddress...".to_string()),
+        lender: None,
+        amount: Some("1000000000000000000".to_string()),
+        status: "Active".to_string(),
+        created_at: chrono::Utc::now().timestamp() as u64 - 3600,
+        events_count: 2,
+    }];
+
     Json(loans)
 }
 
@@ -190,7 +191,7 @@ async fn get_statistics() -> Json<Statistics> {
     let mut event_types = HashMap::new();
     event_types.insert("LoanCreated".to_string(), 1);
     event_types.insert("CollateralAdded".to_string(), 1);
-    
+
     Json(Statistics {
         total_events: 2,
         total_loans: 1,

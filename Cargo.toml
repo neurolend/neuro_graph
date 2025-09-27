@@ -3,6 +3,10 @@ name = "neuro_graph"
 version = "0.0.1"
 edition = "2021"
 
+[[bin]]
+name = "api_server"
+path = "api_server/src/simple_main.rs"
+
 [lib]
 name = "substreams"
 crate-type = ["cdylib"]
@@ -16,6 +20,17 @@ prost = "0.13.3"
 prost-types = "0.13.3"
 substreams = "0.6.0"
 substreams-ethereum = "0.10.2"
+
+# API server dependencies
+tokio = { version = "1.0", features = ["full"] }
+axum = "0.7"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tower-http = { version = "0.5", features = ["cors"] }
+anyhow = "1.0"
+tracing = "0.1"
+tracing-subscriber = "0.3"
+chrono = { version = "0.4", features = ["serde"] }
 
 # Required so that ethabi > ethereum-types build correctly under wasm32-unknown-unknown
 [target.wasm32-unknown-unknown.dependencies]

@@ -5,21 +5,3 @@ builder = "NIXPACKS"
 healthcheckPath = "/health"
 healthcheckTimeout = 300
 restartPolicyType = "ON_FAILURE"
-
-[[services]]
-name = "neurolend-api"
-source = "api_server"
-
-[services.variables]
-PORT = "3001"
-RUST_LOG = "info"
-INDEXER_OUTPUT_DIR = "/tmp/events"
-
-[[services]]
-name = "neurolend-indexer" 
-source = "custom_indexer"
-
-[services.variables]
-RUST_LOG = "info"
-RPC_URL = "https://evmrpc.0g.ai"
-STARTING_BLOCK = "6914309"
