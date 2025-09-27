@@ -228,7 +228,7 @@ impl DataStore {
                         .as_ref()
                         .map_or(false, |l| l.eq_ignore_ascii_case(user_address))
             })
-            .cloned()
+            .map(|loan| loan.clone())
             .collect()
     }
 
